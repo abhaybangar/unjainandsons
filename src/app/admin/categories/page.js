@@ -7,13 +7,19 @@ export const metadata = {
 };
 
 export default async function AdminCategoriesPage() {
-  await connectDB();
-  const categories = await Category.find({}).sort({ name: 1 }).lean();
-
-  const formatted = categories.map((c) => ({
-    ...c,
-    _id: c._id.toString(),
-  }));
+  let formatted = [];
+  try {
+    const conn = await connectDB();
+    if (conn) {
+      const categories = await Category.find({}).sort({ name: 1 }).lean();
+      formatted = categories.map((c) => ({
+        ...c,
+        _id: c._id.toString(),
+      }));
+    }
+  } catch (err) {
+    console.warn("Categories page DB fallback:", err.message);
+  }
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">

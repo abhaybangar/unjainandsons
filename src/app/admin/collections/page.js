@@ -7,13 +7,19 @@ export const metadata = {
 };
 
 export default async function AdminCollectionsPage() {
-  await connectDB();
-  const collections = await Collection.find({}).sort({ createdAt: -1 }).lean();
-
-  const formatted = collections.map((c) => ({
-    ...c,
-    _id: c._id.toString(),
-  }));
+  let formatted = [];
+  try {
+    const conn = await connectDB();
+    if (conn) {
+      const collections = await Collection.find({}).sort({ createdAt: -1 }).lean();
+      formatted = collections.map((c) => ({
+        ...c,
+        _id: c._id.toString(),
+      }));
+    }
+  } catch (err) {
+    console.warn("Collections page DB fallback:", err.message);
+  }
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">

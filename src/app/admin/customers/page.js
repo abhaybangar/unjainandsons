@@ -6,8 +6,15 @@ export const metadata = {
 };
 
 export default async function AdminCustomersPage() {
-  await connectDB();
-  const users = await User.find({}).sort({ createdAt: -1 }).lean();
+  let users = [];
+  try {
+    const conn = await connectDB();
+    if (conn) {
+      users = await User.find({}).sort({ createdAt: -1 }).lean();
+    }
+  } catch (err) {
+    console.warn("Customers page DB fallback:", err.message);
+  }
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">

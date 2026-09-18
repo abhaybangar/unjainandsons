@@ -7,15 +7,21 @@ export const metadata = {
 };
 
 export default async function AdminOrdersPage() {
-  await connectDB();
-  const orders = await Order.find({}).sort({ createdAt: -1 }).lean();
-
-  const formatted = orders.map((o) => ({
-    ...o,
-    _id: o._id.toString(),
-    createdAt: o.createdAt?.toISOString(),
-    updatedAt: o.updatedAt?.toISOString(),
-  }));
+  let formatted = [];
+  try {
+    const conn = await connectDB();
+    if (conn) {
+      const orders = await Order.find({}).sort({ createdAt: -1 }).lean();
+      formatted = orders.map((o) => ({
+        ...o,
+        _id: o._id.toString(),
+        createdAt: o.createdAt?.toISOString(),
+        updatedAt: o.updatedAt?.toISOString(),
+      }));
+    }
+  } catch (err) {
+    console.warn("Orders page DB fallback:", err.message);
+  }
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">

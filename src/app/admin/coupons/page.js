@@ -7,14 +7,20 @@ export const metadata = {
 };
 
 export default async function AdminCouponsPage() {
-  await connectDB();
-  const coupons = await Coupon.find({}).sort({ createdAt: -1 }).lean();
-
-  const formatted = coupons.map((c) => ({
-    ...c,
-    _id: c._id.toString(),
-    expiresAt: c.expiresAt?.toISOString(),
-  }));
+  let formatted = [];
+  try {
+    const conn = await connectDB();
+    if (conn) {
+      const coupons = await Coupon.find({}).sort({ createdAt: -1 }).lean();
+      formatted = coupons.map((c) => ({
+        ...c,
+        _id: c._id.toString(),
+        expiresAt: c.expiresAt?.toISOString(),
+      }));
+    }
+  } catch (err) {
+    console.warn("Coupons page DB fallback:", err.message);
+  }
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">

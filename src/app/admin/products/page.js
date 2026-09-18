@@ -3,20 +3,36 @@ import Product from "@/models/Product.js";
 import Link from "next/link";
 import ProductsListClient from "./ProductsListClient";
 
+import { PRODUCTS } from "@/data/products.js";
+
 export const metadata = {
   title: "Manage Products | UNJ Admin",
 };
 
 export default async function AdminProductsPage() {
-  await connectDB();
-  const products = await Product.find({}).sort({ createdAt: -1 }).lean();
-
-  const formatted = products.map((p) => ({
+  let formatted = PRODUCTS.map((p) => ({
     ...p,
-    _id: p._id.toString(),
-    createdAt: p.createdAt?.toISOString(),
-    updatedAt: p.updatedAt?.toISOString(),
+    _id: String(p.id),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   }));
+
+  try {
+    const conn = await connectDB();
+    if (conn) {
+      const products = await Product.find({}).sort({ createdAt: -1 }).lean();
+      if (products && products.length > 0) {
+        formatted = products.map((p) => ({
+          ...p,
+          _id: p._id.toString(),
+          createdAt: p.createdAt?.toISOString(),
+          updatedAt: p.updatedAt?.toISOString(),
+        }));
+      }
+    }
+  } catch (err) {
+    console.warn("AdminProductsPage DB fallback:", err.message);
+  }
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">

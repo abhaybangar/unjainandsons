@@ -7,17 +7,24 @@ export const metadata = {
 };
 
 export default async function AdminReviewsPage() {
-  await connectDB();
-  const reviews = await Review.find({})
-    .populate("product", "name")
-    .sort({ createdAt: -1 })
-    .lean();
+  let formatted = [];
+  try {
+    const conn = await connectDB();
+    if (conn) {
+      const reviews = await Review.find({})
+        .populate("product", "name")
+        .sort({ createdAt: -1 })
+        .lean();
 
-  const formatted = reviews.map((r) => ({
-    ...r,
-    _id: r._id.toString(),
-    createdAt: r.createdAt?.toISOString(),
-  }));
+      formatted = reviews.map((r) => ({
+        ...r,
+        _id: r._id.toString(),
+        createdAt: r.createdAt?.toISOString(),
+      }));
+    }
+  } catch (error) {
+    console.warn("Reviews fetch fallback:", error.message);
+  }
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
