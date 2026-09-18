@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F223D" />
+      <stop offset="50%" stop-color="#0C1B33" />
+      <stop offset="100%" stop-color="#060E1A" />
+    </linearGradient>
+
+    <!-- Gold Foil Gradient Primary -->
+    <linearGradient id="goldPrimary" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FBF2D8" />
+      <stop offset="25%" stop-color="#E5C378" />
+      <stop offset="50%" stop-color="#C5A059" />
+      <stop offset="75%" stop-color="#9E782F" />
+      <stop offset="100%" stop-color="#D8B263" />
+    </linearGradient>
+
+    <!-- Gold Sheen Accent Gradient -->
+    <linearGradient id="goldLight" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#C5A059" />
+      <stop offset="40%" stop-color="#FFF5DA" />
+      <stop offset="70%" stop-color="#E2BA68" />
+      <stop offset="100%" stop-color="#8B6924" />
+    </linearGradient>
+
+    <!-- Diamond Facet Gradient -->
+    <linearGradient id="diamondGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.95" />
+      <stop offset="100%" stop-color="#D4AF37" stop-opacity="0.6" />
+    </linearGradient>
+    <linearGradient id="diamondGrad2" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FAF6EE" stop-opacity="0.9" />
+      <stop offset="100%" stop-color="#9E782F" stop-opacity="0.7" />
+    </linearGradient>
+
+    <!-- Subtle Glow Filter -->
+    <filter id="goldGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Base Rounded Squircle with Luxury Bevel Border -->
+  <rect x="16" y="16" width="480" height="480" rx="108" fill="url(#bgGrad)" stroke="url(#goldPrimary)" stroke-width="8" />
+  <rect x="28" y="28" width="456" height="456" rx="96" fill="none" stroke="url(#goldLight)" stroke-width="1.5" stroke-opacity="0.4" />
+
+  <!-- Corner Ornamental Accent Dots -->
+  <circle cx="64" cy="64" r="3.5" fill="#E5C378" opacity="0.6" />
+  <circle cx="448" cy="64" r="3.5" fill="#E5C378" opacity="0.6" />
+  <circle cx="64" cy="448" r="3.5" fill="#E5C378" opacity="0.6" />
+  <circle cx="448" cy="448" r="3.5" fill="#E5C378" opacity="0.6" />
+
+  <!-- Top Diamond Emblem Crown -->
+  <g transform="translate(0, -6)">
+    <!-- Diamond Table (Top flat facet) -->
+    <polygon points="216,92 296,92 276,72 236,72" fill="url(#goldLight)" />
+    <!-- Diamond Crown facets -->
+    <polygon points="236,72 276,72 256,54" fill="#FFF8E7" />
+    <polygon points="216,92 236,72 200,92" fill="url(#goldPrimary)" opacity="0.85" />
+    <polygon points="276,72 296,92 312,92" fill="url(#goldPrimary)" opacity="0.85" />
+    <!-- Diamond Pavilion (Lower triangular cone facets) -->
+    <polygon points="200,92 256,134 228,92" fill="url(#goldPrimary)" opacity="0.9" />
+    <polygon points="228,92 256,134 256,92" fill="url(#goldLight)" />
+    <polygon points="256,92 256,134 284,92" fill="#FFF5DA" />
+    <polygon points="284,92 256,134 312,92" fill="url(#goldPrimary)" opacity="0.9" />
+  </g>
+
+  <!-- Sparkle Glint / Diamond Star on top-right -->
+  <path d="M 324 62 Q 324 76 338 76 Q 324 76 324 90 Q 324 76 310 76 Q 324 76 324 62 Z" fill="#FFFFFF" opacity="0.95" />
+  <circle cx="324" cy="76" r="2" fill="#FFF5DA" />
+
+  <!-- Luxury Monogram "Z" -->
+  <!-- Main chiseled Serif 'Z' Body -->
+  <g filter="url(#goldGlow)">
+    <!-- Top Horizontal Bar with Serif Drop -->
+    <path d="M 152 168 L 360 168 L 360 196 L 332 204 L 236 204 L 354 340 L 360 340 L 360 382 L 152 382 L 152 354 L 182 346 L 284 346 L 160 206 L 152 206 Z" fill="url(#goldLight)" />
+  </g>
+
+  <!-- High-Precision Solid Chiseled Letter 'Z' -->
+  <path d="M 148 165 L 364 165 C 364 165 364 195 348 200 L 254 200 L 358 325 C 365 334 366 352 366 384 L 146 384 C 146 384 146 354 162 349 L 262 349 L 154 220 C 147 212 148 195 148 165 Z" fill="url(#goldPrimary)" />
+
+  <!-- Diagonal Cut Accent / Highlights for 3D Chisel Effect -->
+  <polygon points="148,165 364,165 340,185 172,185" fill="#FFF5DA" opacity="0.6" />
+  <polygon points="262,349 366,384 146,384 172,364" fill="#8B6924" opacity="0.5" />
+  <polygon points="254,200 358,325 340,332 236,207" fill="#FFFFFF" opacity="0.3" />
+
+  <!-- Bottom Hallmark Accent: "EST. 2026" / Luxury Geometric Bar -->
+  <line x1="168" y1="420" x2="228" y2="420" stroke="url(#goldLight)" stroke-width="2" stroke-linecap="round" opacity="0.7" />
+  <polygon points="256,415 261,420 256,425 251,420" fill="#E5C378" />
+  <line x1="284" y1="420" x2="344" y2="420" stroke="url(#goldLight)" stroke-width="2" stroke-linecap="round" opacity="0.7" />
+</svg>

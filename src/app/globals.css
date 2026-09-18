@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-sans), sans-serif;
+  --font-serif: var(--font-serif), serif;
+  
+  --color-primary: #0C1B33;
+  --color-accent-gold: #C5A059;
+  --color-accent-gold-hover: #D4AF37;
+  --color-cream: #FAF6EE;
+  --color-charcoal: #222222;
+}
+
+/* Custom CSS utilities for luxury effects */
+.gold-gradient {
+  background: linear-gradient(135deg, #B38728 0%, #FBF5B7 50%, #DAA520 100%);
+}
+
+.gold-gradient-text {
+  background: linear-gradient(135deg, #B38728 0%, #FBF5B7 50%, #DAA520 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.shadow-gold {
+  box-shadow: 0 4px 20px -2px rgba(197, 160, 89, 0.2);
+}
+
+:root {
+  --background: #FAF6EE;
+  --foreground: #222222;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+}
+

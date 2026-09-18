@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Production-Ready Jewelry E-commerce — Next.js + MongoDB</title>
+<style>
+:root{--ink:#171717;--muted:#666;--line:#ddd8cf;--paper:#faf9f6;--card:#fff;--accent:#111}
+*{box-sizing:border-box} body{margin:0;background:var(--paper);color:var(--ink);font-family:Inter,Arial,sans-serif;line-height:1.6}
+main{max-width:1100px;margin:auto;padding:48px 28px 80px}
+h1{font-size:34px;line-height:1.15;margin:0 0 10px} h2{margin-top:46px;border-bottom:1px solid var(--line);padding-bottom:8px}
+h3{margin-top:28px} h4{margin-bottom:6px}.subtitle{color:var(--muted);font-size:16px}
+.note{background:#f0ede6;border-left:4px solid #222;padding:14px 18px;margin:20px 0}
+pre{background:#151515;color:#eee;padding:18px;border-radius:10px;overflow:auto;font-size:13px;line-height:1.55}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px}
+.diagram{background:white;border:1px solid var(--line);border-radius:14px;padding:24px;margin:18px 0;overflow:auto}
+.flow{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}
+.box{border:2px solid #222;border-radius:10px;padding:14px 18px;text-align:center;min-width:145px;background:#fff}
+.arrow{font-size:24px;font-weight:bold}.layer{display:grid;gap:10px;margin:12px auto;max-width:850px}
+.small{font-size:13px;color:var(--muted)}
+table{width:100%;border-collapse:collapse;background:white;margin:15px 0}th,td{border:1px solid var(--line);padding:9px;text-align:left;font-size:13px;vertical-align:top}th{background:#eeeae2}
+.badge{display:inline-block;border:1px solid #bbb;border-radius:99px;padding:2px 8px;font-size:11px;margin:2px}
+.checklist{columns:2;column-gap:40px}.checklist div{break-inside:avoid;margin:6px 0}
+@media print{body{background:white}main{padding:20px}h2{break-before:auto}.diagram{break-inside:avoid}pre{white-space:pre-wrap}.card{break-inside:avoid}}
+</style>
+</head>
+<body>
+<main>
+<h1>Production-Ready Jewelry E-commerce</h1>
+<div class="subtitle">End-to-end execution blueprint • Next.js App Router + JavaScript + MongoDB + Mongoose</div>
+
+<div class="note"><strong>Goal:</strong> Build a real client-facing jewelry brand store from zero to production. The system includes a premium storefront, catalog, search/filtering, authentication, cart, wishlist, checkout, payments, orders, reviews, customer accounts, and a protected admin dashboard.</div>
+
+<h2>1. Technology Stack</h2>
+<div class="grid">
+<div class="card"><strong>Frontend + Server</strong><br>Next.js App Router<br>React<br>JavaScript</div>
+<div class="card"><strong>Styling</strong><br>Tailwind CSS<br>Custom design tokens<br>Responsive/mobile-first UI</div>
+<div class="card"><strong>Database</strong><br>MongoDB<br>Mongoose ODM</div>
+<div class="card"><strong>Commerce</strong><br>Payment gateway<br>Server-side order validation<br>Webhook processing</div>
+<div class="card"><strong>Media</strong><br>Object/image storage<br>CDN<br>Next.js Image</div>
+<div class="card"><strong>Production</strong><br>Vercel or equivalent<br>Managed MongoDB<br>Error monitoring</div>
+</div>
+
+<h2>2. System Architecture</h2>
+<div class="diagram">
+<div class="flow">
+<div class="box">Customer Browser<br><span class="small">Mobile / Desktop</span></div><div class="arrow">→</div>
+<div class="box">Next.js<br><span class="small">UI + Server Components</span></div><div class="arrow">→</div>
+<div class="box">Server Actions /<br>Route Handlers</div><div class="arrow">→</div>
+<div class="box">Mongoose<br><span class="small">Data Access</span></div><div class="arrow">→</div>
+<div class="box">MongoDB</div>
+</div>
+<div class="flow" style="margin-top:24px">
+<div class="box">Payments</div><div class="arrow">↔</div>
+<div class="box">Webhook<br>Verification</div><div class="arrow">→</div>
+<div class="box">Order State</div>
+</div>
+<div class="flow" style="margin-top:24px">
+<div class="box">Admin Dashboard</div><div class="arrow">→</div>
+<div class="box">Protected Server Operations</div><div class="arrow">→</div>
+<div class="box">MongoDB / Storage / Payments</div>
+</div>
+</div>
+
+<h3>Security boundary</h3>
+<pre>CLIENT
+  ↓
+UI / forms / interactions
+  ↓
+SERVER BOUNDARY
+  ├── Authentication
+  ├── Authorization
+  ├── Input validation
+  ├── Price calculation
+  ├── Inventory checks
+  ├── Coupon validation
+  ├── Order creation
+  ├── Payment verification
+  └── Database access
+  ↓
+MongoDB / external services
+
+Rule: never trust client-provided price, stock, discount,
+payment status, order status, or admin permission.</pre>
+
+<h2>3. Final Folder & File Structure</h2>
+<pre>jewelry-store/
+├── public/
+│   ├── icons/
+│   ├── logos/
+│   └── placeholders/
+│
+├── src/
+│   ├── app/
+│   │   ├── (store)/
+│   │   │   ├── page.js
+│   │   │   ├── shop/
+│   │   │   │   ├── page.js
+│   │   │   │   └── [category]/
+│   │   │   │       └── page.js
+│   │   │   ├── product/
+│   │   │   │   └── [slug]/
+│   │   │   │       └── page.js
+│   │   │   ├── collections/
+│   │   │   │   ├── page.js
+│   │   │   │   └── [slug]/
+│   │   │   │       └── page.js
+│   │   │   ├── search/
+│   │   │   │   └── page.js
+│   │   │   ├── wishlist/
+│   │   │   │   └── page.js
+│   │   │   ├── cart/
+│   │   │   │   └── page.js
+│   │   │   ├── checkout/
+│   │   │   │   └── page.js
+│   │   │   ├── account/
+│   │   │   │   ├── page.js
+│   │   │   │   ├── orders/
+│   │   │   │   │   ├── page.js
+│   │   │   │   │   └── [id]/page.js
+│   │   │   │   └── profile/
+│   │   │   │       └── page.js
+│   │   │   └── layout.js
+│   │   │
+│   │   ├── (auth)/
+│   │   │   ├── login/page.js
+│   │   │   ├── register/page.js
+│   │   │   ├── forgot-password/page.js
+│   │   │   └── reset-password/[token]/page.js
+│   │   │
+│   │   ├── admin/
+│   │   │   ├── page.js
+│   │   │   ├── products/
+│   │   │   │   ├── page.js
+│   │   │   │   ├── new/page.js
+│   │   │   │   └── [id]/page.js
+│   │   │   ├── categories/page.js
+│   │   │   ├── collections/page.js
+│   │   │   ├── orders/
+│   │   │   │   ├── page.js
+│   │   │   │   └── [id]/page.js
+│   │   │   ├── customers/page.js
+│   │   │   ├── reviews/page.js
+│   │   │   ├── coupons/page.js
+│   │   │   ├── settings/page.js
+│   │   │   └── layout.js
+│   │   │
+│   │   ├── api/
+│   │   │   ├── payments/
+│   │   │   │   └── webhook/route.js
+│   │   │   ├── upload/route.js
+│   │   │   └── health/route.js
+│   │   │
+│   │   ├── layout.js
+│   │   ├── globals.css
+│   │   ├── loading.js
+│   │   ├── not-found.js
+│   │   └── error.js
+│   │
+│   ├── components/
+│   │   ├── ui/
+│   │   ├── layout/
+│   │   ├── navigation/
+│   │   ├── home/
+│   │   ├── product/
+│   │   ├── cart/
+│   │   ├── checkout/
+│   │   ├── account/
+│   │   ├── admin/
+│   │   └── forms/
+│   │
+│   ├── actions/
+│   │   ├── auth.js
+│   │   ├── products.js
+│   │   ├── cart.js
+│   │   ├── wishlist.js
+│   │   ├── checkout.js
+│   │   ├── orders.js
+│   │   └── admin.js
+│   │
+│   ├── models/
+│   │   ├── User.js
+│   │   ├── Product.js
+│   │   ├── Category.js
+│   │   ├── Collection.js
+│   │   ├── ProductImage.js
+│   │   ├── Cart.js
+│   │   ├── Wishlist.js
+│   │   ├── Address.js
+│   │   ├── Order.js
+│   │   ├── Payment.js
+│   │   ├── Coupon.js
+│   │   └── Review.js
+│   │
+│   ├── lib/
+│   │   ├── mongodb.js
+│   │   ├── auth.js
+│   │   ├── permissions.js
+│   │   ├── payments.js
+│   │   ├── storage.js
+│   │   ├── email.js
+│   │   ├── validations.js
+│   │   ├── utils.js
+│   │   └── constants.js
+│   │
+│   ├── data/
+│   │   └── navigation.js
+│   │
+│   └── middleware.js
+│
+├── scripts/
+│   └── seed.js
+│
+├── tests/
+│   ├── unit/
+│   ├── integration/
+│   └── e2e/
+│
+├── .env.example
+├── .gitignore
+├── eslint.config.mjs
+├── next.config.mjs
+├── package.json
+└── README.md</pre>
+
+<div class="note"><strong>Important:</strong> Do not create every file on day one. This is the <em>target architecture</em>. During execution, create folders/files when their phase begins.</div>
+
+<h2>4. Route Map</h2>
+<table>
+<tr><th>Area</th><th>Route</th><th>Purpose</th></tr>
+<tr><td>Store</td><td>/</td><td>Brand homepage</td></tr>
+<tr><td>Store</td><td>/shop</td><td>All products</td></tr>
+<tr><td>Store</td><td>/shop/[category]</td><td>Category products</td></tr>
+<tr><td>Store</td><td>/product/[slug]</td><td>Product details</td></tr>
+<tr><td>Store</td><td>/collections</td><td>Curated collections</td></tr>
+<tr><td>Store</td><td>/collections/[slug]</td><td>Collection details</td></tr>
+<tr><td>Store</td><td>/search</td><td>Search results</td></tr>
+<tr><td>Commerce</td><td>/wishlist</td><td>Saved products</td></tr>
+<tr><td>Commerce</td><td>/cart</td><td>Shopping cart</td></tr>
+<tr><td>Commerce</td><td>/checkout</td><td>Checkout and payment</td></tr>
+<tr><td>Account</td><td>/account</td><td>Account overview</td></tr>
+<tr><td>Account</td><td>/account/orders</td><td>Order history</td></tr>
+<tr><td>Account</td><td>/account/orders/[id]</td><td>Order details</td></tr>
+<tr><td>Account</td><td>/account/profile</td><td>Profile and addresses</td></tr>
+<tr><td>Auth</td><td>/login</td><td>Login</td></tr>
+<tr><td>Auth</td><td>/register</td><td>Registration</td></tr>
+<tr><td>Admin</td><td>/admin</td><td>Dashboard</td></tr>
+<tr><td>Admin</td><td>/admin/products</td><td>Product management</td></tr>
+<tr><td>Admin</td><td>/admin/products/new</td><td>Create product</td></tr>
+<tr><td>Admin</td><td>/admin/products/[id]</td><td>Edit product</td></tr>
+<tr><td>Admin</td><td>/admin/categories</td><td>Category management</td></tr>
+<tr><td>Admin</td><td>/admin/collections</td><td>Collection management</td></tr>
+<tr><td>Admin</td><td>/admin/orders</td><td>Order management</td></tr>
+<tr><td>Admin</td><td>/admin/customers</td><td>Customer management</td></tr>
+<tr><td>Admin</td><td>/admin/reviews</td><td>Review moderation</td></tr>
+<tr><td>Admin</td><td>/admin/coupons</td><td>Coupon management</td></tr>
+<tr><td>API</td><td>/api/payments/webhook</td><td>Verified payment webhooks</td></tr>
+<tr><td>API</td><td>/api/upload</td><td>Secure image upload if required</td></tr>
+<tr><td>API</td><td>/api/health</td><td>Health check</td></tr>
+</table>
+
+<h2>5. MongoDB Data Model</h2>
+<div class="diagram">
+<div class="flow"><div class="box">User</div><div class="arrow">→</div><div class="box">Address</div></div>
+<div class="flow"><div class="box">User</div><div class="arrow">→</div><div class="box">Order</div><div class="arrow">→</div><div class="box">OrderItem</div><div class="arrow">→</div><div class="box">Product</div></div>
+<div class="flow"><div class="box">User</div><div class="arrow">→</div><div class="box">Wishlist</div><div class="arrow">→</div><div class="box">Product</div></div>
+<div class="flow"><div class="box">User</div><div class="arrow">→</div><div class="box">Review</div><div class="arrow">→</div><div class="box">Product</div></div>
+<div class="flow"><div class="box">Product</div><div class="arrow">→</div><div class="box">Category</div></div>
+<div class="flow"><div class="box">Product</div><div class="arrow">→</div><div class="box">Collection</div></div>
+<div class="flow"><div class="box">Product</div><div class="arrow">→</div><div class="box">ProductImage</div></div>
+<div class="flow"><div class="box">Order</div><div class="arrow">→</div><div class="box">Payment</div></div>
+</div>
+
+<table>
+<tr><th>Model</th><th>Main responsibility</th></tr>
+<tr><td>User</td><td>Customer identity, role, account information</td></tr>
+<tr><td>Product</td><td>Name, slug, description, pricing, inventory, category, collection, SEO data</td></tr>
+<tr><td>Category</td><td>Rings, necklaces, earrings, bracelets, etc.</td></tr>
+<tr><td>Collection</td><td>Curated brand collections and campaigns</td></tr>
+<tr><td>ProductImage</td><td>Image URL, alt text, ordering, primary image</td></tr>
+<tr><td>Cart</td><td>Active customer cart and item references</td></tr>
+<tr><td>Wishlist</td><td>Saved product references</td></tr>
+<tr><td>Address</td><td>Customer shipping/billing addresses</td></tr>
+<tr><td>Order</td><td>Immutable purchase snapshot, totals, customer, shipping, status</td></tr>
+<tr><td>Payment</td><td>Provider reference, status, amount, verification data</td></tr>
+<tr><td>Coupon</td><td>Discount rules, limits, validity period</td></tr>
+<tr><td>Review</td><td>Customer review, rating, moderation state</td></tr>
+</table>
+
+<h2>6. Exact Execution Phases</h2>
+
+<h3>Phase 0 — Project & Git Foundation</h3>
+<div class="card">
+<p>Create/verify the existing Next.js JavaScript project.</p>
+<p>Keep App Router and Tailwind CSS.</p>
+<p>Initialize Git, establish the main development branch, and create .env.example.</p>
+<p>Verify development, lint and production build commands.</p>
+<strong>Checkpoint:</strong> clean project starts, lints and builds.</div>
+
+<h3>Phase 1 — Brand & Design System</h3>
+<div class="card">
+<p>Decide brand name, logo treatment, typography, colors, spacing and photography direction.</p>
+<p>Update <code>globals.css</code> and root layout.</p>
+<p>Create reusable UI primitives under <code>components/ui</code>.</p>
+<p>Create button, container, heading, input, modal/drawer, badge, skeleton and product-card foundations.</p>
+<strong>Checkpoint:</strong> consistent visual system works on mobile and desktop.</div>
+
+<h3>Phase 2 — Storefront Shell</h3>
+<div class="card">
+<p>Create Navbar, mobile navigation, search trigger, wishlist trigger, cart trigger and Footer.</p>
+<p>Create global announcement bar and newsletter section.</p>
+<p>Create store layout in <code>app/(store)/layout.js</code>.</p>
+<strong>Checkpoint:</strong> every storefront page can share one consistent shell.</div>
+
+<h3>Phase 3 — Premium Homepage</h3>
+<div class="card">
+<p>Create Hero, Featured Categories, Featured Products, Collection Banner, Brand Story, Editorial Section, Reviews and Newsletter sections.</p>
+<p>Use responsive images and proper loading behavior.</p>
+<p>Keep product content data-driven.</p>
+<strong>Checkpoint:</strong> polished responsive homepage with no backend dependency for static brand sections.</div>
+
+<h3>Phase 4 — MongoDB + Mongoose Foundation</h3>
+<div class="card">
+<p>Install/configure Mongoose.</p>
+<p>Create <code>src/lib/mongodb.js</code> with a reusable connection strategy appropriate for Next.js development and server execution.</p>
+<p>Create all required Mongoose models under <code>src/models</code>.</p>
+<p>Add schema indexes for slugs, email, product/category lookup, orders and other high-frequency queries.</p>
+<p>Create <code>scripts/seed.js</code> for development data.</p>
+<p>Run initial seed with categories, collections, products and development users.</p>
+<strong>Checkpoint:</strong> application connects to MongoDB and can create/read seeded data.</div>
+
+<h3>Phase 5 — Product & Catalog System</h3>
+<div class="card">
+<p>Create server-side product queries/actions.</p>
+<p>Create ProductCard, ProductGrid, ProductGallery, ProductInfo, VariantSelector, Price, StockStatus, Filters and Sort components.</p>
+<p>Build /shop, category, collection, search and product detail pages.</p>
+<p>Implement pagination/load strategy suitable for the expected catalog size.</p>
+<strong>Checkpoint:</strong> storefront catalog is completely database-driven.</div>
+
+<h3>Phase 6 — Authentication & Authorization</h3>
+<div class="card">
+<p>Choose and configure a secure authentication mechanism.</p>
+<p>Create <code>lib/auth.js</code> and <code>lib/permissions.js</code>.</p>
+<p>Build login, register, forgot-password and reset-password flows.</p>
+<p>Define CUSTOMER and ADMIN roles.</p>
+<p>Protect account routes and admin routes on the server.</p>
+<strong>Checkpoint:</strong> customer sessions and admin authorization work correctly.</div>
+
+<h3>Phase 7 — Cart & Wishlist</h3>
+<div class="card">
+<p>Create Cart and Wishlist models/actions.</p>
+<p>Build CartDrawer, CartItem, CartSummary and wishlist controls.</p>
+<p>Implement add/remove/update/clear.</p>
+<p>Validate stock server-side.</p>
+<p>Define guest-cart behavior and merge strategy after login if guest shopping is supported.</p>
+<strong>Checkpoint:</strong> cart/wishlist state is persistent and correct.</div>
+
+<h3>Phase 8 — Checkout & Payments</h3>
+<div class="card">
+<p>Create checkout address, shipping, coupon and summary components.</p>
+<p>Create server-side order preparation.</p>
+<p>Integrate the selected payment gateway.</p>
+<p>Create <code>app/api/payments/webhook/route.js</code>.</p>
+<p>Verify webhook signatures.</p>
+<p>Make order/payment processing idempotent.</p>
+<p>Recalculate price, discount, shipping and inventory on the server.</p>
+<strong>Checkpoint:</strong> a successful test payment produces exactly one valid order.</div>
+
+<h3>Phase 9 — Orders & Customer Account</h3>
+<div class="card">
+<p>Create order history and order detail pages.</p>
+<p>Create order confirmation.</p>
+<p>Implement order status transitions.</p>
+<p>Add transactional email events where required.</p>
+<strong>Checkpoint:</strong> customer can reliably see the complete purchase lifecycle.</div>
+
+<h3>Phase 10 — Admin Dashboard</h3>
+<div class="card">
+<p>Create protected admin layout and dashboard.</p>
+<p>Build product CRUD, categories, collections and image management.</p>
+<p>Build order management and status updates.</p>
+<p>Build customer list, review moderation, coupon management and store settings.</p>
+<p>Keep destructive actions protected and audited where necessary.</p>
+<strong>Checkpoint:</strong> business owner can operate the store without editing code.</div>
+
+<h3>Phase 11 — SEO & Discoverability</h3>
+<div class="card">
+<p>Add route metadata and dynamic product/category/collection metadata.</p>
+<p>Create sitemap and robots configuration.</p>
+<p>Add canonical URLs where needed.</p>
+<p>Add Open Graph metadata.</p>
+<p>Add appropriate structured data for products, breadcrumbs and organization.</p>
+<strong>Checkpoint:</strong> important public pages are crawlable and shareable.</div>
+
+<h3>Phase 12 — Security Hardening</h3>
+<div class="card">
+<p>Validate every user-controlled mutation.</p>
+<p>Enforce authorization on the server.</p>
+<p>Rate-limit sensitive operations.</p>
+<p>Protect uploads.</p>
+<p>Verify payment webhooks.</p>
+<p>Keep all secrets in environment variables.</p>
+<p>Never trust browser totals, stock, discount or payment state.</p>
+<strong>Checkpoint:</strong> security review passes before public launch.</div>
+
+<h3>Phase 13 — Performance & Accessibility</h3>
+<div class="card">
+<p>Keep client components only where interactivity requires them.</p>
+<p>Optimize images and fonts.</p>
+<p>Use loading states and streaming where useful.</p>
+<p>Audit bundle size.</p>
+<p>Test keyboard navigation, focus states, semantic markup, labels and contrast.</p>
+<p>Test slow networks and mobile devices.</p>
+<strong>Checkpoint:</strong> storefront feels fast and works for a broad range of users.</div>
+
+<h3>Phase 14 — Testing</h3>
+<div class="card">
+<p><strong>Unit:</strong> pricing, discounts, validation, permissions, stock rules.</p>
+<p><strong>Integration:</strong> database-backed product/cart/order operations.</p>
+<p><strong>E2E:</strong> login → browse → product → cart → checkout → payment → order → account.</p>
+<p>Test failures such as invalid coupons, out-of-stock products, duplicate webhooks and unauthorized admin access.</p>
+<strong>Checkpoint:</strong> critical commerce flows pass automatically.</div>
+
+<h3>Phase 15 — Production Deployment</h3>
+<div class="card">
+<p>Create production MongoDB database/cluster and credentials.</p>
+<p>Configure production environment variables.</p>
+<p>Deploy the Next.js application.</p>
+<p>Configure image storage/CDN and payment webhooks.</p>
+<p>Create production admin account securely.</p>
+<p>Configure domain, HTTPS, email sender and monitoring.</p>
+<p>Run production smoke tests.</p>
+<strong>Checkpoint:</strong> stable production deployment with rollback capability.</div>
+
+<h3>Phase 16 — Launch & Maintenance</h3>
+<div class="card">
+<p>Verify payments, emails, inventory, shipping, returns/refunds and legal pages.</p>
+<p>Take a database backup before launch.</p>
+<p>Monitor errors, payment failures, webhook failures, slow pages and checkout issues.</p>
+<p>Document admin operations and release procedures.</p>
+<strong>Checkpoint:</strong> store is ready for client handover and ongoing maintenance.</div>
+
+<h2>7. Commerce Flow</h2>
+<div class="diagram">
+<div class="flow">
+<div class="box">Browse Products</div><div class="arrow">→</div>
+<div class="box">Product Page</div><div class="arrow">→</div>
+<div class="box">Cart</div><div class="arrow">→</div>
+<div class="box">Checkout</div><div class="arrow">→</div>
+<div class="box">Server Validation</div><div class="arrow">→</div>
+<div class="box">Payment</div>
+</div>
+<div class="flow" style="margin-top:18px">
+<div class="box">Verified Webhook</div><div class="arrow">→</div>
+<div class="box">Create/Update Order</div><div class="arrow">→</div>
+<div class="box">Email</div><div class="arrow">→</div>
+<div class="box">Customer + Admin</div>
+</div>
+</div>
+
+<h2>8. Product Management Flow</h2>
+<div class="diagram">
+<div class="flow">
+<div class="box">Admin Login</div><div class="arrow">→</div>
+<div class="box">Admin Authorization</div><div class="arrow">→</div>
+<div class="box">Product Form</div><div class="arrow">→</div>
+<div class="box">Validation</div><div class="arrow">→</div>
+<div class="box">Image Storage</div><div class="arrow">→</div>
+<div class="box">MongoDB</div>
+</div>
+<div class="flow" style="margin-top:18px">
+<div class="box">MongoDB</div><div class="arrow">→</div>
+<div class="box">Server Query</div><div class="arrow">→</div>
+<div class="box">Product Page / Listing</div><div class="arrow">→</div>
+<div class="box">Customer</div>
+</div>
+</div>
+
+<h2>9. Exact Build Order</h2>
+<ol>
+<li>Verify current Next.js JavaScript project.</li>
+<li>Git + environment conventions.</li>
+<li>Brand tokens and global CSS.</li>
+<li>Reusable UI primitives.</li>
+<li>Navbar + Footer + responsive store layout.</li>
+<li>Premium homepage.</li>
+<li>MongoDB + Mongoose connection.</li>
+<li>Mongoose schemas + indexes + seed script.</li>
+<li>Product/catalog server queries.</li>
+<li>Shop/category/collection/product/search pages.</li>
+<li>Authentication + CUSTOMER/ADMIN roles.</li>
+<li>Cart + wishlist.</li>
+<li>Checkout + payment integration.</li>
+<li>Orders + email events.</li>
+<li>Admin dashboard + CRUD.</li>
+<li>SEO + structured data.</li>
+<li>Security hardening.</li>
+<li>Performance + accessibility.</li>
+<li>Unit/integration/E2E testing.</li>
+<li>Production deployment.</li>
+<li>Launch checklist + monitoring + handover.</li>
+</ol>
+
+<h2>10. Production Checklist</h2>
+<div class="checklist">
+<div>☐ MongoDB production database</div>
+<div>☐ Environment secrets outside Git</div>
+<div>☐ Secure authentication</div>
+<div>☐ Server-side authorization</div>
+<div>☐ Input validation</div>
+<div>☐ Server-side price calculation</div>
+<div>☐ Server-side inventory validation</div>
+<div>☐ Payment signature verification</div>
+<div>☐ Idempotent payment handling</div>
+<div>☐ Secure image upload</div>
+<div>☐ Error boundaries</div>
+<div>☐ Loading states</div>
+<div>☐ 404 handling</div>
+<div>☐ Mobile responsive UI</div>
+<div>☐ Accessibility review</div>
+<div>☐ SEO metadata</div>
+<div>☐ Sitemap + robots</div>
+<div>☐ Product structured data</div>
+<div>☐ Privacy / Terms</div>
+<div>☐ Shipping / Returns policy</div>
+<div>☐ Transactional email</div>
+<div>☐ Payment test flow</div>
+<div>☐ Database backup</div>
+<div>☐ Error monitoring</div>
+<div>☐ Production domain + HTTPS</div>
+<div>☐ Admin documentation</div>
+<div>☐ Rollback procedure</div>
+</div>
+
+<h2>11. What NOT to Do</h2>
+<div class="grid">
+<div class="card"><strong>Don't</strong><br>Put MongoDB queries directly inside random client components.</div>
+<div class="card"><strong>Don't</strong><br>Trust client-side totals, stock, discounts or payment status.</div>
+<div class="card"><strong>Don't</strong><br>Store product images permanently inside the Git repository.</div>
+<div class="card"><strong>Don't</strong><br>Create dozens of abstractions before the feature requires them.</div>
+<div class="card"><strong>Don't</strong><br>Expose MongoDB credentials or payment secrets to the browser.</div>
+<div class="card"><strong>Don't</strong><br>Build only the UI and postpone the actual data model until the end.</div>
+</div>
+
+<div class="note"><strong>Master rule:</strong> We build this phase-by-phase. Each phase must work before the next one begins. The target structure above is the production destination; files are created progressively during implementation.</div>
+</main>
+</body>
+</html>
